@@ -1,0 +1,47 @@
+﻿<Window x:Class="Build_Shop_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Build_Shop_WPF"
+        mc:Ignorable="d"
+        Title="Окно авторизации" Height="450" Width="600">
+    <Window.Resources>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
+            <TextBlock Text="Авторизация" FontSize="50px" TextAlignment="Center" Margin="0 0 0 50"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.25*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label FontSize="20" Grid.Column="0">Логин:</Label>
+                <TextBox x:Name="tbLoginUser" Grid.Column="1"></TextBox>
+            </Grid>
+            <Grid Margin="0 20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.25*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label FontSize="20" Grid.Column="0">Пароль:</Label>
+                <TextBox x:Name="tbPassword" Grid.Column="1"></TextBox>
+            </Grid>
+            <Button Name="btLogIn" Click="btLogIn_Click"  Content="Авторизироваться" Margin="0 0 0 20"/>
+            <Button Visibility="Hidden" Name="btSingUp" Click="btSingUp_Click" Content="Отсуствует аккаунт? Зарегистироваться!" Style="{DynamicResource MaterialDesignFlatButton}"/>
+        </StackPanel>
+    </Grid>
+</Window>

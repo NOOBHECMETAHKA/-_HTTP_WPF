@@ -1,0 +1,730 @@
+﻿<Window x:Class="Build_Shop_WPF.Dispatcher"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Build_Shop_WPF"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="Окно диспетчера" Height="820" Width="1080" Closed="Window_Closed">
+    
+    <Grid>
+        <TabControl Name="TC_Dispatcher" Style="{DynamicResource MaterialDesignNavigationRailTabControl}">
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AlertOctagram"/>
+                        <TextBlock>Задачи</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid Name="dg_Tasks" ItemsSource="{Binding TasksList}" Loaded="datagrids_Loaded" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdTask}"/>
+                                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Описание" Binding="{Binding Description}"/>
+                                    <DataGridTextColumn Header="Дата создания" Binding="{Binding DateCreate, StringFormat=dd.MM.yyyy}"/>
+                                    <DataGridTextColumn Header="Время создания" Binding="{Binding TimeCreate, StringFormat=hh\\:mm}"/>
+                                    <DataGridTextColumn Header="Дата изменения" Binding="{Binding DateChange, StringFormat=dd.MM.yyyy}"/>
+                                    <DataGridTextColumn Header="Время изменения" Binding="{Binding TimeChange, StringFormat=hh\\:mm}"/>
+                                    <DataGridTextColumn Header="Дата окончания" Binding="{Binding DateEnd, StringFormat=dd.MM.yyyy}"/>
+                                    <DataGridTextColumn Header="Время окончания" Binding="{Binding TimeEnd, StringFormat=hh\\:mm}"/>
+                                    <DataGridTextColumn Header="Проект ID" Binding="{Binding ProjectId}"/>
+                                    <DataGridTextColumn Header="Статус ID" Binding="{Binding StatusId}"/>
+                                    <DataGridCheckBoxColumn Header="Is Deleted" Visibility="Hidden" Binding="{Binding IsDeleted}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Name="bt_PaginationTaskBack" Click="bt_PaginationTask_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock Name="lb_Tasks" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button Name="bt_PaginationTaskForward" Click="bt_PaginationTask_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBox x:Name="tb_TaskName" FontSize="18" materialDesign:HintAssist.Hint="Наименование" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBox x:Name="tb_TaskDescription" FontSize="18" materialDesign:HintAssist.Hint="Описание" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <DatePicker Name="dp_DateStartTask" FontSize="18" materialDesign:HintAssist.Hint="Начало" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintDatePicker}"/>
+                                <DatePicker Name="dp_DateChangeTask" FontSize="18" materialDesign:HintAssist.Hint="Корректировки" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintDatePicker}"/>
+                                <DatePicker Name="dp_DateEndTask" FontSize="18" materialDesign:HintAssist.Hint="Окончание" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintDatePicker}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox Name="cd_TaskProject" ItemsSource="{Binding ProjectsList}" DisplayMemberPath="Name" SelectedValuePath="IdProject" Loaded="cd_TaskProject_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Проект" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                                <ComboBox Name="cd_TaskStatus" ItemsSource="{Binding StatusList}" DisplayMemberPath="LevelStatus" SelectedValuePath="IdStatus" Loaded="cd_TaskStatus_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Статус" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                                <TextBox x:Name="tb_StartTask" FontSize="18" Margin="20 10" Text="{Binding Source={x:Static sys:DateTime.Now}, Mode=OneWay,  StringFormat='HH:mm:ss'}"/>
+                                <TextBox x:Name="tb_ChangeTask" FontSize="18" Margin="20 10" Text="{Binding Source={x:Static sys:DateTime.Now}, Mode=OneWay,  StringFormat='HH:mm:ss'}"/>
+                                <TextBox x:Name="tb_EndTask" FontSize="18" Margin="20 10" Text="{Binding Source={x:Static sys:DateTime.Now}, Mode=OneWay,  StringFormat='HH:mm:ss'}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="Insert_Task" Click="Insert_Task_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button x:Name="Update_Task" Click="Update_Task_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button x:Name="Delete_Task" Click="Delete_Task_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AlertBox"/>
+                        <TextBlock>Статус задачи</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid x:Name="dgStatusTask" Loaded="datagrids_Loaded" ItemsSource="{Binding StatusList}" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdStatus}"/>
+                                    <DataGridTextColumn Header="Уровень" Binding="{Binding LevelStatus}"/>
+                                    <DataGridTextColumn Header="Наименование" Binding="{Binding NameStatus}"/>
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button x:Name="bt_PaginationStatusTaskBack" Click="bt_PaginationStatusTask_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock x:Name="lb_StatusTask" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button x:Name="bt_PaginationStatusTaskForward" Click="bt_PaginationStatusTask_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBox x:Name="tb_LevelImportantStatus" FontSize="18" materialDesign:HintAssist.Hint="Уровень важности" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBox x:Name="tb_NameStatus" FontSize="18" materialDesign:HintAssist.Hint="Наименование" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="Insert_StatusChange" Click="Insert_StatusChange_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button x:Name="Update_StatusChange" Click="Update_StatusChange_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button x:Name="Delete_StatusChange" Click="Delete_StatusChange_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AlphaPBox"/>
+                        <TextBlock>Проект</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid x:Name="dg_Project" Loaded="datagrids_Loaded" ItemsSource="{Binding Projects}" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdProject}" />
+                                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" />
+                                    <DataGridTextColumn Header="Дата создания" Binding="{Binding DateCreate, StringFormat=dd.MM.yyyy}" />
+                                    <DataGridTextColumn Header="Время создания" Binding="{Binding TimeCreate, StringFormat=hh\\:mm}" />
+                                    <DataGridTextColumn Header="Дата завершения" Binding="{Binding DateEnd, StringFormat=dd.MM.yyyy}" />
+                                    <DataGridTextColumn Header="Время завершения" Binding="{Binding TimeEnd, StringFormat=hh\\:mm}" />
+                                    <DataGridTextColumn Header="ID клиента" Binding="{Binding ClientId}" />
+                                    <DataGridTextColumn Header="Удалено" Visibility="Hidden" Binding="{Binding IsDeleted}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Name="bt_PaginationProjectBack" Click="bt_PaginationProject_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock x:Name="lb_Projects" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button Name="bt_PaginationProjectForward" Click="bt_PaginationProject_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBox x:Name="tb_NameProject" FontSize="18" materialDesign:HintAssist.Hint="Наименование" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <DatePicker x:Name="dp_DateCreatedProject" FontSize="18" materialDesign:HintAssist.Hint="Дата создания" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintDatePicker}"/>
+                                <TextBox x:Name="tb_TimeCreatedProject" FontSize="18" Margin="20 10" Text="{Binding Source={x:Static sys:DateTime.Now}, Mode=OneWay,  StringFormat='HH:mm:ss'}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <DatePicker Name="dp_DateEndProject" FontSize="18" materialDesign:HintAssist.Hint="Дата окончания" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintDatePicker}"/>
+                                <TextBox x:Name="tb_TimeEndProject" FontSize="18" Margin="20 10" Text="{Binding Source={x:Static sys:DateTime.Now}, Mode=OneWay,  StringFormat='HH:mm:ss'}"/>
+                                <ComboBox Name="cd_ClientProject" ItemsSource="{Binding ClientsList}" DisplayMemberPath="Email" SelectedValuePath="IdClient" Loaded="cd_ClientProject_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Клиент" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="Insert_Project" Click="Insert_Project_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button x:Name="Update_Project" Click="Update_Project_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button x:Name="Delete_Project" Click="Delete_Project_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AccountHardHat"/>
+                        <TextBlock>Состав работников</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid x:Name="dg_CompositionEmployee" ItemsSource="{Binding CompositionEmployeeList}" Loaded="datagrids_Loaded" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdCompositionEmployees}"/>
+                                    <DataGridTextColumn Header="Работник ID" Binding="{Binding UserId}"/>
+                                    <DataGridTextColumn Header="Проект ID" Binding="{Binding ProjectId}"/>
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button x:Name="bt_PaginationCompositionEmployeeBack" Click="bt_PaginationCompositionEmployee_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock x:Name="lb_CompositionEmployee" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button x:Name="bt_PaginationCompositionEmployeeForward" Click="bt_PaginationCompositionEmployee_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <ComboBox Name="cd_Employee_CompositionEmployee" ItemsSource="{Binding UsersList}" DisplayMemberPath="Email" SelectedValuePath="IdUser" Loaded="cd_Employee_CompositionEmployee_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Работник" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox Name="cd_Project_CompositionEmployee" ItemsSource="{Binding ProjectsList}" DisplayMemberPath="Name" SelectedValuePath="IdProject" Loaded="cd_Project_CompositionEmployee_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Проект" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="Insert_CompositionEmployee" Click="Insert_CompositionEmployee_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button Name="Update_CompositionEmployee" Click="Update_CompositionEmployee_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button x:Name="Delete_CompositionEmployee" Click="Delete_CompositionEmployee_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="SwordCross"/>
+                        <TextBlock>Состав оборудывания</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid x:Name="dg_CompositionEquipment" Loaded="datagrids_Loaded" ItemsSource="{Binding CompositionEquipmentList}" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdCompositionEquipment}" />
+                                    <DataGridTextColumn Header="Оборудывание ID" Binding="{Binding EquipmentId}" />
+                                    <DataGridTextColumn Header="Проект ID" Binding="{Binding ProjectId}" />
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button x:Name="bt_PaginationCompositionEquipmentBack" Click="bt_PaginationCompositionEquipments_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock Name="lb_CompositionEquipments" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button x:Name="bt_PaginationCompositionEquipmentForward" Click="bt_PaginationCompositionEquipments_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <ComboBox Name="cd_EquipmentCompositionEquipment" ItemsSource="{Binding EquipmentList}" DisplayMemberPath="IdEquipment" SelectedValuePath="IdEquipment" Loaded="cd_EquipmentCompositionEquipment_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Оборудывание" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox x:Name="cd_ProjectCompositionEquipment" ItemsSource="{Binding ProjectsList}" DisplayMemberPath="Name" SelectedValuePath="IdProject" Loaded="cd_ProjectCompositionEquipment_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Проект" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="Insert_CompositionEquipment" Click="Insert_CompositionEquipment_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button x:Name="Update_CompositionEquipment" Click="Update_CompositionEquipment_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button x:Name="Delete_CompositionEquipment" Click="Delete_CompositionEquipment_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Sword"/>
+                        <TextBlock>Оборудывание</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid Name="dg_Equipment" ItemsSource="{Binding Equipments}" Loaded="datagrids_Loaded" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdEquipment}" />
+                                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" />
+                                    <DataGridTextColumn Header="Количество" Binding="{Binding Count}" />
+                                    <DataGridTextColumn Header="Склад ID" Binding="{Binding WarehouseId}" />
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Name="bt_PaginationEquipmentBack" Click="bt_PaginationEquipment_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock Name="lb_Equipment" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button x:Name="bt_PaginationEquipmentForward" Click="bt_PaginationEquipment_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBox x:Name="tb_NameEquipment" FontSize="18" materialDesign:HintAssist.Hint="Наименование" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBox x:Name="tb_AmountEquipment" FontSize="18" materialDesign:HintAssist.Hint="Количество" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <ComboBox Name="сb_warehouse" ItemsSource="{Binding WarehouseList}" DisplayMemberPath="IdWarehouse" SelectedValuePath="IdWarehouse" Loaded="сb_warehouse_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Склад" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="Insert_Equipment" Click="Insert_Equipment_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button x:Name="Update_Equipment" Click="Update_Equipment_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button x:Name="Delete_Equipment" Click="Delete_Equipment_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="SemanticWeb"/>
+                        <TextBlock>Склад</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid Name="dg_Warehouse" ItemsSource="{Binding Warehouses}" Loaded="datagrids_Loaded" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdWarehouse}" />
+                                    <DataGridTextColumn Header="Город" Binding="{Binding City}" />
+                                    <DataGridTextColumn Header="Улица" Binding="{Binding Street}" />
+                                    <DataGridTextColumn Header="Номер здания" Binding="{Binding NumberBuild}" />
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Name="bt_PaginationWarehouseBack" Click="bt_PaginationWarehouse_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock Name="lb_Warehouse" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button Name="bt_PaginationWarehouseForward" Click="bt_PaginationWarehouse_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBox x:Name="tb_CityWarehouse" FontSize="18" materialDesign:HintAssist.Hint="Город" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBox x:Name="tb_StreetWarehouse" FontSize="18" materialDesign:HintAssist.Hint="Улица" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBox Name="tb_NumberHouse" FontSize="18" materialDesign:HintAssist.Hint="Номер здания" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="Insert_Warehouse" Click="Insert_Warehouse_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button Name="Update_Warehouse" Click="Update_Warehouse_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button Name="Delete_Warehouse" Click="Delete_Warehouse_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Toolbox"/>
+                        <TextBlock>Материал</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid Name="dg_Material" ItemsSource="{Binding Materials}" Loaded="datagrids_Loaded" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding IdMaterial}"/>
+                                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Количество" Binding="{Binding Amount}"/>
+                                    <DataGridTextColumn Header="Цена" Binding="{Binding Price}"/>
+                                    <DataGridTextColumn Header="Склад ID" Binding="{Binding WarehouseId}"/>
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Name="bt_PaginationMaterialBack" Click="bt_PaginationMaterial_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock Name="lb_Materials" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button Name="bt_PaginationMaterialForward" Click="bt_PaginationMaterial_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBox Name="tb_NameMaterial" FontSize="18" materialDesign:HintAssist.Hint="Наименование" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBox Name="tb_CountMaterial" FontSize="18" materialDesign:HintAssist.Hint="Количество" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBox Name="tb_PriceMaterial" FontSize="18" materialDesign:HintAssist.Hint="Стоимость" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                                <ComboBox Name="cb_WirehouseMaterial" ItemsSource="{Binding WarehouseList}" DisplayMemberPath="IdWarehouse" SelectedValuePath="IdWarehouse" Loaded="cb_WirehouseMaterial_Loaded" FontSize="18" materialDesign:HintAssist.Hint="Склад" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="Insert_Material" Click="Insert_Material_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button Name="Update_Material" Click="Update_Material_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button Name="Delete_Material" Click="Delete_Material_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Tooltip"/>
+                        <TextBlock>Состав материала</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.70*"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="0.25*"/>
+                        </Grid.RowDefinitions>
+                        <!--Datagrid-->
+                        <Grid Margin="40 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <DataGrid Name="dg_CompositionMaterial" ItemsSource="{Binding CompositionMaterials}" Loaded="datagrids_Loaded" Grid.Row="0" Grid.ColumnSpan="3" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False" IsReadOnly="True" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding IdCompositionMaterial}"/>
+                                    <DataGridTextColumn Header="Материалы ID" Binding="{Binding MaterialId}"/>
+                                    <DataGridTextColumn Header="Проект ID" Binding="{Binding ProjectId}"/>
+                                    <DataGridCheckBoxColumn Header="IsDeleted" Visibility="Hidden" Binding="{Binding IsDeleted}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Name="bt_PaginationCompositionMaterialBack" Click="bt_PaginationCompositionMaterial_Click" Content="Назад" Grid.Row="1" Grid.Column="0" />
+                            <TextBlock Name="lb_CompositionMaterial" Text="1" TextAlignment="Center" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" />
+                            <Button Name="bt_PaginationCompositionMaterialForward" Click="bt_PaginationCompositionMaterial_Click" Content="Вперёд" Grid.Row="1" Grid.Column="2" />
+                        </Grid>
+                        <!--Datagrid-->
+                        <!--Поля ввода-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions> 
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <ComboBox Name="cd_MaterialCompositionMaterial" Loaded="cd_MaterialCompositionMaterial_Loaded" ItemsSource="{Binding MaterialsList}" DisplayMemberPath="Name" SelectedValuePath="IdMaterial" FontSize="18" materialDesign:HintAssist.Hint="Материал" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox Name="cb_ProjectCompositionMaterial" Loaded="cb_ProjectCompositionMaterial_Loaded" ItemsSource="{Binding ProjectsList}" DisplayMemberPath="Name" SelectedValuePath="IdProject" FontSize="18" materialDesign:HintAssist.Hint="Проект" Margin="20 10" Style="{DynamicResource MaterialDesignFloatingHintComboBox}"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--Поля ввода-->
+                        <!--Кнопки CRUD-->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="Insert_CompositionMaterial" Click="Insert_CompositionMaterial_Click" Content="Добавить" Margin="20 0" Grid.Column="0"/>
+                            <Button Name="Update_CompositionMaterial" Click="Update_CompositionMaterial_Click" Content="Изменить" Margin="20 0" Grid.Column="1"/>
+                            <Button Name="Delete_CompositionMaterial" Click="Delete_CompositionMaterial_Click" Background="Red" Content="Удалить" Margin="20 0" Grid.Column="2"/>
+                        </Grid>
+                        <!--Кнопки CRUD-->
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem Width="200">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Tooltip"/>
+                        <TextBlock>Настройки</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <!--Страница-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.ColumnSpan="2" Text="Настройки" FontWeight="Bold" FontSize="30" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <Button Content="Восстановление задач" Grid.Row="1" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить задачи" Grid.Row="1" Grid.Column="1" Background="Red" Margin="40 0"/>
+                        <Button Content="Восстановление статусов задач" Grid.Row="2" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить статусы задач" Grid.Row="2" Grid.Column="1" Background="Red" Margin="40 0"/>
+                        <Button Content="Восстановление проектов" Grid.Row="3" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить проекты" Grid.Row="3" Grid.Column="1" Background="Red" Margin="40 0"/>
+                        <Button Content="Восстановление составов работников" Grid.Row="4" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить составы работников" Grid.Row="4" Grid.Column="1" Background="Red" Margin="40 0"/>
+                        <Button Content="Отсчистить составы оборудывания" Grid.Row="5" Grid.Column="1" Background="Red" Margin="40 0"/>
+                        <Button Content="Восстановление состава оборудывания" Grid.Row="5" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Восстановление оборудывания" Grid.Row="6" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить оборудывания" Grid.Row="6" Background="Red" Grid.Column="1" Margin="40 0"/>
+                        <Button Content="Восстановление складов" Grid.Row="7" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить складов" Grid.Row="7" Background="Red" Grid.Column="1" Margin="40 0"/>
+                        <Button Content="Восстановление материалов" Grid.Row="8" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить материалов" Grid.Row="8" Background="Red" Grid.Column="1" Margin="40 0"/>
+                        <Button Content="Восстановление состава материалов" Grid.Row="9" Grid.Column="0" Margin="40 0"/>
+                        <Button Content="Отсчистить состава материалов" Grid.Row="9" Background="Red" Grid.Column="1" Margin="40 0"/>
+                        <Button x:Name="bt_ManagerWindow" FontSize="24" Height="50" FontWeight="Bold" Click="bt_ManagerWindow_Click" Content="Окно менеджера" Grid.Row="99" Grid.ColumnSpan="2" Margin="150 0" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                    </Grid>
+                    <!--Страница-->
+                </TabItem.Content>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>
